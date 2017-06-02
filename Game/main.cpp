@@ -1,6 +1,9 @@
 #include "window.h"
+#include "game.h"
+#include "aiplayer.h"
 #include <QApplication>
 #include <iostream>
+
 
 int main(int argc, char *argv[])
 {
@@ -9,5 +12,12 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     Window window;
     window.show();
+
+
+    AIPlayer player =  AIPlayer();
+    Game game = Game(&player);
+    
+    game.play();
+
     return a.exec();
 }
