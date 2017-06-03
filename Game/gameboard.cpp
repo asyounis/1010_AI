@@ -15,26 +15,20 @@ void GameBoard::paintEvent(QPaintEvent * /* event */)
     drawGameGrid();
 }
 
-
-void GameBoard::drawGameCells()
+void GameBoard::setGrid(int gridIn[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE])
 {
-
-    int grid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE];
-
     for (int x = 0; x < GAME_BOARD_GRID_SIZE; x++)
     {
         for (int y = 0; y < GAME_BOARD_GRID_SIZE; y++)
         {
-            grid[x][y] = 0;
+            grid[y][x] = gridIn[y][x];
         }
     }
-
-    for (int i = 0; i < GAME_BOARD_GRID_SIZE; i++)
-    {
-        grid[i][i] = 1;
-    }
+}
 
 
+void GameBoard::drawGameCells()
+{
     QBrush brush = QBrush(QColor(255, 0, 0));
     QPen pen = QPen(QColor(255, 0, 0));
 
@@ -50,7 +44,7 @@ void GameBoard::drawGameCells()
     {
         for (int y = 0; y < GAME_BOARD_GRID_SIZE; y++)
         {
-            if (grid[x][y] != 0)
+            if (grid[y][x] != 0)
             {
                 QRect rect(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
                 painter.drawRect(rect);

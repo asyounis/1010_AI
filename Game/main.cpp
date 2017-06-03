@@ -3,6 +3,13 @@
 #include "aiplayer.h"
 #include <QApplication>
 #include <iostream>
+#include <thread>
+
+Game *game;
+
+void gamePlay() {
+    game->play();
+}
 
 
 int main(int argc, char *argv[])
@@ -15,9 +22,9 @@ int main(int argc, char *argv[])
 
 
     AIPlayer player =  AIPlayer();
-    Game game = Game(&player);
-    
-    game.play();
+    game = new Game(&player, &window);
+
+    // std::thread t1(gamePlay);   
 
     return a.exec();
 }

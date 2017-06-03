@@ -1,6 +1,7 @@
 #include "window.h"
 #include "gameboard.h"
 #include "Global.h"
+#include "pieces.h"
 
 #include <QPainter>
 #include <QGridLayout>
@@ -15,6 +16,20 @@ Window::Window(QWidget *parent) : QWidget(parent)
 
     // Add the game board to the window
     gameBoard = new GameBoard(this);
+
+
+    int spacing = WINDOW_WIDTH - (NUMBER_OF_PIECES_PER_ROUND * PIECES_WIDTH);
+    spacing /= (NUMBER_OF_PIECES_PER_ROUND + 1);
+
+
+    int xPos = spacing;
+    for (int i = 0; i < NUMBER_OF_PIECES_PER_ROUND; i++)
+    {
+        piece[i] = new Pieces(this);
+        piece[i]->setPosition(xPos, 350);
+        piece[i]->update();
+        xPos += spacing + PIECES_WIDTH;
+    }
 }
 
 
@@ -22,8 +37,20 @@ Window::Window(QWidget *parent) : QWidget(parent)
 
 void Window::renderPieces(int pieces[NUMBER_OF_PIECES_PER_ROUND])
 {
-
+    for (int i = 0; i < NUMBER_OF_PIECES_PER_ROUND; i++)
+    {
+        piece[i]->setPiece(pieces[i]);
+        piece[i]->update();
+    }
 }
+
+
+void Window::renderGrid(int grid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE])
+{
+    gameBoard->setGrid(grid);
+    gameBoard->update();
+}
+
 
 void Window::paintEvent(QPaintEvent * /* event */)
 {
