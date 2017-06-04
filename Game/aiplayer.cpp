@@ -324,7 +324,7 @@ void AIPlayer::calculateMoves(int pieces[NUMBER_OF_PIECES_PER_ROUND], int origGr
                 delete [] currentMove->grid[g];
             }
             delete [] currentMove->grid;
-            delete movetmpOrig.at(m);
+            delete movetmpOrig->at(m);
         }
 
         delete movetmpOrig;
