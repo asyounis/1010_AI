@@ -330,8 +330,6 @@ void AIPlayer::calculateMoves(int pieces[NUMBER_OF_PIECES_PER_ROUND], int origGr
         delete movetmpOrig;
     }
 
-
-
     for (size_t m = 0; m < moveTmp->size(); m++)
     {
         moves->push_back(moveTmp->at(m));
@@ -339,7 +337,6 @@ void AIPlayer::calculateMoves(int pieces[NUMBER_OF_PIECES_PER_ROUND], int origGr
 
     delete moveTmp;
     moveTmp->clear();
-
 }
 
 void AIPlayer::evaluateMove(Move *m)

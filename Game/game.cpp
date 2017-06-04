@@ -50,7 +50,8 @@ void Game::generatePieces(int *piece)
 {
     for (int i = 0; i < NUMBER_OF_PIECES_PER_ROUND; i++)
     {
-        piece[i] = 16;//rand() % NUMBER_OF_PIECE_TYPES;
+        // piece[i] = 16;//rand() % NUMBER_OF_PIECE_TYPES;
+        piece[i] = rand() % NUMBER_OF_PIECE_TYPES;
     }
 }
 
@@ -205,8 +206,8 @@ void Game::play()
         std::cout << "Score: " << score << "\n";
 
         std::cout << "\n\n\n\n\n\n\n";
-        // usleep(1000 000);
-        // sleep(4);
+        // usleep(1000000);
+        sleep(4);
     }
 
     std::cout << "Game Over" << "\n";
