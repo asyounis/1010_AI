@@ -81,8 +81,6 @@ bool AIPlayer::playRound(int grid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE],
         delete [] permutationsVector.at(i);
     }
 
-
-
     if (moves->size() == 0)
     {
         delete moves;
@@ -107,7 +105,6 @@ bool AIPlayer::playRound(int grid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE],
     for (int i = 0; i < NUMBER_OF_PIECES_PER_ROUND; i++)
     {
         piece[i] = moves->at(bestMoveIndex)->piece[i];
-        // piece[i] = 16;//moves->at(bestMoveIndex)->piece[i];
         x[i] = moves->at(bestMoveIndex)->x[i];
         y[i] = moves->at(bestMoveIndex)->y[i];
     }
@@ -232,15 +229,15 @@ void AIPlayer::calculateMoves(int pieces[NUMBER_OF_PIECES_PER_ROUND], int origGr
     }
 
 
-    std::vector<Move*> moveTmp = std::vector<Move*>();
-    moveTmp.push_back(initMove);
+    std::vector<Move*> *moveTmp = new std::vector<Move*>();
+    moveTmp->push_back(initMove);
 
 
     // Do all additional pieces
     for (int i = 0; i < NUMBER_OF_PIECES_PER_ROUND; i++)
     {
-        std::vector<Move*> movetmpOrig = std::vector<Move*>(moveTmp);
-        moveTmp.clear();
+        std::vector<Move*> *movetmpOrig = moveTmp;
+        moveTmp = new std::vector<Move*>();
 
         // Get the piece data
         int pWidth = 0;
@@ -250,9 +247,9 @@ void AIPlayer::calculateMoves(int pieces[NUMBER_OF_PIECES_PER_ROUND], int origGr
         // Get the piece data
         Game::getGridForPiece(pieces[i], pWidth, pHeight, pGrid);
 
-        for (size_t m = 0; m < movetmpOrig.size(); m++)
+        for (size_t m = 0; m < movetmpOrig->size(); m++)
         {
-            Move  *currentMove = movetmpOrig.at(m);
+            Move  *currentMove = movetmpOrig->at(m);
             for (int piecePlacementX = 0; piecePlacementX < (GAME_BOARD_GRID_SIZE - pWidth + 1); piecePlacementX++)
             {
                 for (int piecePlacementY = 0; piecePlacementY < (GAME_BOARD_GRID_SIZE - pHeight + 1); piecePlacementY++)
@@ -318,7 +315,7 @@ void AIPlayer::calculateMoves(int pieces[NUMBER_OF_PIECES_PER_ROUND], int origGr
 
                     newMove->numberOfLinesCleared += processGrid(newMove->grid);
 
-                    moveTmp.push_back(newMove);
+                    moveTmp->push_back(newMove);
                 }
             }
 
@@ -329,16 +326,19 @@ void AIPlayer::calculateMoves(int pieces[NUMBER_OF_PIECES_PER_ROUND], int origGr
             delete [] currentMove->grid;
             delete movetmpOrig.at(m);
         }
+
+        delete movetmpOrig;
     }
 
 
 
-    for (size_t m = 0; m < moveTmp.size(); m++)
+    for (size_t m = 0; m < moveTmp->size(); m++)
     {
-        moves->push_back(moveTmp.at(m));
+        moves->push_back(moveTmp->at(m));
     }
 
-    moveTmp.clear();
+    delete moveTmp;
+    moveTmp->clear();
 
 }
 
