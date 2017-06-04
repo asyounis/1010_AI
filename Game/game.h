@@ -17,6 +17,10 @@ public:
 
     static void getGridForPiece(int piece, int &width, int &height, int pGrid[5][5])
     {
+
+        // Clear the array
+        memset(pGrid, 0, sizeof(pGrid[0][0]) * 5 * 5);
+
         // Allocate memory for the moves
         // int **pGrid = new int*[5];
         // pGrid[0] = new int[5];
@@ -209,7 +213,7 @@ public:
 private:
     int grid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE];
     Player *player;
-    Window *window;    
+    Window *window;
     int score;
 
 

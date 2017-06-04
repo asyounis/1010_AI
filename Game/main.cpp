@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     AIPlayer player =  AIPlayer();
     game = new Game(&player, &window);
 
-    // std::thread t1(gamePlay);   
+    std::thread t1(gamePlay);   
 
     return a.exec();
 }

@@ -19,6 +19,12 @@ Game::Game(Player *p, Window *w):
     // Seed the random number generator
     srand(time(NULL));
 
+
+    if (window != NULL)
+    {
+        // Draw the game pieces for this round
+        window->renderGrid(grid);
+    }
 }
 
 
@@ -44,7 +50,7 @@ void Game::generatePieces(int *piece)
 {
     for (int i = 0; i < NUMBER_OF_PIECES_PER_ROUND; i++)
     {
-        piece[i] = rand() % NUMBER_OF_PIECE_TYPES;
+        piece[i] = 16;//rand() % NUMBER_OF_PIECE_TYPES;
     }
 }
 
@@ -52,6 +58,9 @@ void Game::play()
 {
     while (true)
     {
+        std::cout << "Step\n";
+
+
         // Data for this round
         int pieces[NUMBER_OF_PIECES_PER_ROUND];
         int pX[NUMBER_OF_PIECES_PER_ROUND];
@@ -68,8 +77,19 @@ void Game::play()
         }
 
         // Get the move from the player
-        player->playRound(grid, pieces, pX, pY);
+        bool hasMove = player->playRound(grid, pieces, pX, pY);
 
+        for (int i = 0; i < NUMBER_OF_PIECES_PER_ROUND; i++)
+        {
+            std::cout << "(" << pX[i] << ", " << pY[i] << "), ";
+        }
+        std::cout << "\n";
+
+
+        if (!hasMove)
+        {
+            break;
+        }
 
         for (int i = 0; i < NUMBER_OF_PIECES_PER_ROUND; i++)
         {
@@ -77,16 +97,21 @@ void Game::play()
             int pHeight = 0;
             int pGrid[5][5];
 
-            for (int i = 0; i < 5; i++)
-            {
-                for (int j = 0; j < 5; j++)
-                {
-                    pGrid[i][j] = 0;
-                }
-            }
+            // for (int i = 0; i < 5; i++)
+            // {
+            //     for (int j = 0; j < 5; j++)
+            //     {
+            //         pGrid[i][j] = 0;
+            //     }
+            // }
 
             // Get the piece data
             Game::getGridForPiece(pieces[i], pWidth, pHeight, pGrid);
+
+
+            std::cout << pieces[i] << "\n";
+            std::cout << pWidth << ", " << pHeight << "\n";
+
 
             for (int x = 0; x < pWidth; x++)
             {
@@ -178,6 +203,12 @@ void Game::play()
 
 
         std::cout << "Score: " << score << "\n";
-        usleep(100000);
+
+        std::cout << "\n\n\n\n\n\n\n";
+        // usleep(1000 000);
+        // sleep(4);
     }
+
+    std::cout << "Game Over" << "\n";
+
 }
