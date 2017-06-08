@@ -61,7 +61,7 @@ void Pieces::drawCells()
     {
         for (int y = 0; y < 5; y++)
         {
-            if (pGrid[x][y] != 0)
+            if (pGrid[y][x] != 0)
             {
                 QRect rect(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
                 painter.drawRect(rect);

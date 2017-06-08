@@ -13,6 +13,7 @@ class Game
 public:
 
     Game(Player *p, Window *w);
+    ~Game();
     // Game(Player *p);
 
     static void getGridForPiece(int piece, int &width, int &height, int pGrid[5][5])
@@ -209,12 +210,14 @@ public:
     }
 
     void play();
+    int getNumberOfLinesCleared();
 
 private:
     int grid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE];
     Player *player;
     Window *window;
     int score;
+    int numberOfLinesCleared;
 
 
 

@@ -19,4 +19,8 @@
 #define NUMBER_OF_PIECES_PER_ROUND (3) // Number of pieces that can be given per round
 #define NUMBER_OF_PIECES_TO_GENERATE (3 * 100) // number of pieces that the game should pre-generate
 
+
+#define NUMBER_OF_HEURISTICS (5) // Number of pieces that can be given per round
+
+
 #endif // GLOBAL_H

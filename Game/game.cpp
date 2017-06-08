@@ -11,7 +11,8 @@
 Game::Game(Player *p, Window *w):
     player(p),
     window(w),
-    score(0)
+    score(0),
+    numberOfLinesCleared(0)
 {
     // Make sure the grid is empty
     clearGrid();
@@ -19,12 +20,16 @@ Game::Game(Player *p, Window *w):
     // Seed the random number generator
     srand(time(NULL));
 
-
     if (window != NULL)
     {
         // Draw the game pieces for this round
         window->renderGrid(grid);
     }
+}
+
+Game::~Game()
+{
+    delete player;
 }
 
 
@@ -59,7 +64,7 @@ void Game::play()
 {
     while (true)
     {
-        std::cout << "Step\n";
+        // std::cout << "Step\n";
 
 
         // Data for this round
@@ -80,11 +85,11 @@ void Game::play()
         // Get the move from the player
         bool hasMove = player->playRound(grid, pieces, pX, pY);
 
-        for (int i = 0; i < NUMBER_OF_PIECES_PER_ROUND; i++)
-        {
-            std::cout << "(" << pX[i] << ", " << pY[i] << "), ";
-        }
-        std::cout << "\n";
+        // for (int i = 0; i < NUMBER_OF_PIECES_PER_ROUND; i++)
+        // {
+        //     std::cout << "(" << pieces[i] << "      " << pX[i] << ", " << pY[i] << "), ";
+        // }
+        // std::cout << "\n";
 
 
         if (!hasMove)
@@ -110,8 +115,8 @@ void Game::play()
             Game::getGridForPiece(pieces[i], pWidth, pHeight, pGrid);
 
 
-            std::cout << pieces[i] << "\n";
-            std::cout << pWidth << ", " << pHeight << "\n";
+            // std::cout << pieces[i] << "\n";
+            // std::cout << pWidth << ", " << pHeight << "\n";
 
 
             for (int x = 0; x < pWidth; x++)
@@ -169,6 +174,7 @@ void Game::play()
                     continue;
                 }
 
+                numberOfLinesCleared++;
                 score += GAME_BOARD_GRID_SIZE;
 
                 for (int j = 0; j < GAME_BOARD_GRID_SIZE; j++)
@@ -184,6 +190,7 @@ void Game::play()
                     continue;
                 }
 
+                numberOfLinesCleared++;
                 score += GAME_BOARD_GRID_SIZE;
 
                 for (int j = 0; j < GAME_BOARD_GRID_SIZE; j++)
@@ -193,8 +200,6 @@ void Game::play()
             }
         }
 
-
-
         if (window != NULL)
         {
             // Draw the game pieces for this round
@@ -203,13 +208,18 @@ void Game::play()
 
 
 
-        std::cout << "Score: " << score << "\n";
+        // std::cout << "Score: " << score << "\n";
 
-        std::cout << "\n\n\n\n\n\n\n";
-        // usleep(1000000);
-        sleep(4);
+        // std::cout << "\n\n\n\n\n\n\n";
+        // usleep(100000);
+        // sleep(4);
+        // break;
     }
 
-    std::cout << "Game Over" << "\n";
+    // std::cout << "Game Over" << "\n";
+}
 
+int Game::getNumberOfLinesCleared()
+{
+    return numberOfLinesCleared;
 }
