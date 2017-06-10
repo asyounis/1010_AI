@@ -15,12 +15,13 @@
 
 
 #define GAME_BOARD_GRID_SIZE (10) // square grid size
-#define NUMBER_OF_PIECE_TYPES (19) 
-#define NUMBER_OF_PIECES_PER_ROUND (3) // Number of pieces that can be given per round
+#define NUMBER_OF_PIECE_TYPES (19)
+#define NUMBER_OF_PIECES_PER_ROUND (1) // Number of pieces that can be given per round
 #define NUMBER_OF_PIECES_TO_GENERATE (3 * 100) // number of pieces that the game should pre-generate
 
 
 #define NUMBER_OF_HEURISTICS (5) // Number of pieces that can be given per round
+#define NUMBER_OF_TRAINING_PIECES (500)
 
 
 #endif // GLOBAL_H

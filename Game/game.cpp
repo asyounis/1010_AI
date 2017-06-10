@@ -8,11 +8,13 @@
 #include <unistd.h>
 #include <iostream>
 
-Game::Game(Player *p, Window *w):
+Game::Game(Player *p, Window *w, bool isTraining):
     player(p),
     window(w),
     score(0),
-    numberOfLinesCleared(0)
+    numberOfLinesCleared(0),
+    isTraining(isTraining),
+    numberOfPiecesPlayed(0)
 {
     // Make sure the grid is empty
     clearGrid();
@@ -57,6 +59,7 @@ void Game::generatePieces(int *piece)
     {
         // piece[i] = 16;//rand() % NUMBER_OF_PIECE_TYPES;
         piece[i] = rand() % NUMBER_OF_PIECE_TYPES;
+        numberOfPiecesPlayed++;
     }
 }
 
@@ -64,6 +67,12 @@ void Game::play()
 {
     while (true)
     {
+
+        if (isTraining && (numberOfPiecesPlayed > NUMBER_OF_TRAINING_PIECES))
+        {
+            break;
+        }
+
         // std::cout << "Step\n";
 
 

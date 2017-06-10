@@ -12,7 +12,7 @@ class Game
 {
 public:
 
-    Game(Player *p, Window *w);
+    Game(Player *p, Window *w, bool isTraining = false);
     ~Game();
     // Game(Player *p);
 
@@ -218,6 +218,8 @@ private:
     Window *window;
     int score;
     int numberOfLinesCleared;
+    bool isTraining;
+    int numberOfPiecesPlayed;
 
 
 
