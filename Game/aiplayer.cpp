@@ -113,11 +113,11 @@ bool AIPlayer::playRound(int grid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE],
 
     for (size_t m = 0; m < moves->size(); m++)
     {
-        for (int i = 0; i < GAME_BOARD_GRID_SIZE; i++)
-        {
-            delete [] moves->at(m)->grid[i];
-        }
-        delete [] moves->at(m)->grid;
+        // for (int i = 0; i < GAME_BOARD_GRID_SIZE; i++)
+        // {
+            // delete [] moves->at(m)->grid[i];
+        // }
+        // delete [] moves->at(m)->grid;
         delete moves->at(m);
     }
 
@@ -125,7 +125,7 @@ bool AIPlayer::playRound(int grid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE],
     return true;
 }
 
-int AIPlayer::processGrid(int **grid)
+int AIPlayer::processGrid(int grid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE])
 {
 
     int linesCleared = 0;
@@ -206,7 +206,7 @@ void AIPlayer::calculateMoves(int pieces[NUMBER_OF_PIECES_PER_ROUND], int origGr
     // Clear everything
     initMove->moveScore = 0;
     initMove->numberOfLinesCleared = 0;
-    initMove->grid = new int*[GAME_BOARD_GRID_SIZE];
+    // initMove->grid = new int*[GAME_BOARD_GRID_SIZE];
 
     for (int i = 0; i < NUMBER_OF_PIECES_PER_ROUND; i++)
     {
@@ -216,7 +216,7 @@ void AIPlayer::calculateMoves(int pieces[NUMBER_OF_PIECES_PER_ROUND], int origGr
     for (int j = 0; j < GAME_BOARD_GRID_SIZE; j++)
     {
         // Allocate memory
-        initMove->grid[j] = new int[GAME_BOARD_GRID_SIZE];
+        // initMove->grid[j] = new int[GAME_BOARD_GRID_SIZE];
 
         // Copy into the new array;
         for (int t = 0; t < GAME_BOARD_GRID_SIZE; t++)
@@ -287,12 +287,12 @@ void AIPlayer::calculateMoves(int pieces[NUMBER_OF_PIECES_PER_ROUND], int origGr
                     newMove->x[i] = piecePlacementX;
                     newMove->y[i] = piecePlacementY;
 
-                    newMove->grid = new int*[GAME_BOARD_GRID_SIZE];
+                    // newMove->grid = new int*[GAME_BOARD_GRID_SIZE];
 
                     for (int j = 0; j < GAME_BOARD_GRID_SIZE; j++)
                     {
                         // Allocate memory
-                        newMove->grid[j] = new int[GAME_BOARD_GRID_SIZE];
+                        // newMove->grid[j] = new int[GAME_BOARD_GRID_SIZE];
 
                         // Copy into the new array;
                         for (int t = 0; t < GAME_BOARD_GRID_SIZE; t++)
@@ -316,11 +316,11 @@ void AIPlayer::calculateMoves(int pieces[NUMBER_OF_PIECES_PER_ROUND], int origGr
                 }
             }
 
-            for (int g = 0; g < GAME_BOARD_GRID_SIZE; g++)
-            {
-                delete [] currentMove->grid[g];
-            }
-            delete [] currentMove->grid;
+            // for (int g = 0; g < GAME_BOARD_GRID_SIZE; g++)
+            // {
+                // delete [] currentMove->grid[g];
+            // }
+            // delete [] currentMove->grid;
             delete movetmpOrig->at(m);
         }
 
@@ -542,7 +542,7 @@ int** AIPlayer::calculateOrderPermutations(int *p, int count)
 // Finds the maximum area under the histogram represented
 // by histogram.  See below article for details.
 // http://www.geeksforgeeks.org/largest-rectangle-under-histogram/
-int AIPlayer::maxHist(int *row)
+int AIPlayer::maxHist(int row[GAME_BOARD_GRID_SIZE])
 {
     // Create an empty stack. The stack holds indexes of
     // hist[] array/ The bars stored in stack are always
@@ -598,7 +598,7 @@ int AIPlayer::maxHist(int *row)
 }
 
 // Returns area of the largest rectangle with all 1s in A[][]
-int AIPlayer::maxRectangle(int **A)
+int AIPlayer::maxRectangle(int A[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE])
 {
     // Calculate area for first row and initialize it as
     // result

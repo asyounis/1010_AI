@@ -15,7 +15,7 @@ class AIPlayer : public Player
         int y[NUMBER_OF_PIECES_PER_ROUND];
         float moveScore;
         int numberOfLinesCleared;
-        int **grid;
+        int grid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE];
     };
 
 public:
@@ -32,12 +32,12 @@ private:
     int** calculateOrderPermutations(int *p, int count);
 
     void calculateMoves(int pieces[NUMBER_OF_PIECES_PER_ROUND], int grid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE], std::vector<Move*> *moves);
-    int processGrid(int **grid);
+    int processGrid(int grid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE]);
     void evaluateMove(Move *m);
 
 
-    int maxRectangle(int **A);
-    int maxHist(int *row);
+    int maxRectangle(int A[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE]);
+    int maxHist(int row[GAME_BOARD_GRID_SIZE]);
 
     float heuristicCoeff[NUMBER_OF_HEURISTICS];
 

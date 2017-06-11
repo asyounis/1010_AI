@@ -17,10 +17,10 @@
 
 Game *game;
 
-#define POPULATION_SIZE (1000)
+#define POPULATION_SIZE (10000)
 #define RUNS_PER_PARAM_VECT (100)
-#define SUBSET_OF_POPULATION_TO_SELECT (100)
-#define NUMBER_OF_NEW_OFFSPRING (300)
+#define SUBSET_OF_POPULATION_TO_SELECT (1000)
+#define NUMBER_OF_NEW_OFFSPRING (3000)
 #define NUMBER_OF_TUNING_RUNS (200)
 
 #define NUMBER_OF_THREADS (8)
@@ -68,6 +68,10 @@ void gamePlay() {
     }
 }
 
+
+void gamePlay2(Game *game) {
+    game->play();
+}
 
 
 std::vector<int> sort_indexes(int scores[POPULATION_SIZE]) {
@@ -203,13 +207,16 @@ void createNewPopulation()
             mag += (newVect[j][i] * newVect[j][i]);
         }
 
-        if ((rand() % 100) < 5)
+        if ((rand() % 100) < 20)
         {
+            std::cout << "Mutating \n";
+
             int component = rand() % NUMBER_OF_HEURISTICS;
             float amount = rand() % 200000000;
-            amount -= 100000000;
-            amount /= 100000000;
-            amount *= 0.002;
+            amount -= 100000000.0;
+            amount /= 100000000.0;
+            amount *= 0.02;
+            // amount *= 0.002;
 
             mag -= (newVect[j][component] * newVect[j][component]);
 
@@ -411,3 +418,30 @@ int main(int argc, char *argv[])
 
     return a.exec();
 }
+
+
+
+
+// int main(int argc, char *argv[])
+// {
+
+//     QApplication a(argc, argv);
+//     Window window;
+//     window.show();
+
+
+//     float heuristicCoeff[NUMBER_OF_HEURISTICS];
+//     heuristicCoeff[0] = 0.87644898891449;
+//     heuristicCoeff[1] =  0.473638504743576;
+//     heuristicCoeff[2] = -0.0289361644536257;
+//     heuristicCoeff[3] =  -0.0366345383226871;
+//     heuristicCoeff[4] =  -0.0729684233665466;
+
+//     AIPlayer player =  AIPlayer(heuristicCoeff);
+//     Game *game = new Game(&player, NULL);
+//     game = new Game(&player, &window);
+
+//     std::thread t1(gamePlay2, game);
+
+//     return a.exec();
+// }

@@ -2,7 +2,19 @@ QT += core
 QT += widgets
 QT -= gui
 
+
+
 CONFIG += c++11
+
+# QMAKE_CFLAGS_RELEASE -= -O2
+# # QMAKE_CFLAGS_RELEASE += -O3
+# QMAKE_CFLAGS_RELEASE += -Os
+# QMAKE_CXXFLAGS_RELEASE -= -O2
+# # QMAKE_CXXFLAGS_RELEASE += -O3
+# QMAKE_CXXFLAGS_RELEASE += -Os
+
+# # QMAKE_LFLAGS_RELEASE -= -O1
+
 
 TARGET = Game
 CONFIG += console
@@ -40,6 +52,7 @@ HEADERS += \
 
 
 
+CUDA_DIR = "/Developer/NVIDIA/CUDA-7.5"
 
 
 # cuda source
@@ -50,21 +63,47 @@ CUDA_DIR = /usr/local/cuda
 INCLUDEPATH += $$CUDA_DIR/include
 QMAKE_LIBDIR += $$CUDA_DIR/lib
 
+CUDA_OBJECTS_DIR = ./
+
+CUDA_LIBS = -lcudart 
+
+
+SYSTEM_TYPE = 64
 # GPU architecture
-CUDA_ARCH = sm_20
+CUDA_ARCH = sm_22
+
+NVCC_OPTIONS = --use_fast_math
+
 # NVCC flags
 NVCCFLAGS = --compiler-options -fno-strict-aliasing -use_fast_math --ptxas-options=-v
 
-# Path to libraries
-LIBS += -lcudart -lcuda
+
 
 # join the includes in a line
 CUDA_INC = $$join(INCLUDEPATH,' -I','-I',' ')
-cuda.commands = $$CUDA_DIR/bin/nvcc -m64 -O3 -arch=$$CUDA_ARCH -c $$NVCCFLAGS $$CUDA_INC $$LIBS ${QMAKE_FILE_NAME} -o ${QMAKE_FILE_OUT}
-cuda.dependcy_type = TYPE_C
-cuda.depend_command = $$CUDA_DIR/bin/nvcc -O3 -M $$CUDA_INC $$NVCCFLAGS      ${QMAKE_FILE_NAME}
 
-cuda.input = CUDA_SOURCES
-cuda.output = ${OBJECTS_DIR}${QMAKE_FILE_BASE}_cuda.o
+# Path to libraries
+# LIBS += -lcudart -lcuda
+LIBS += $$CUDA_LIBS # <-- needed this
+
+
+# Configuration of the Cuda compiler
+CONFIG(debug, debug|release) {
+    # Debug mode
+    cuda_d.input = CUDA_SOURCES
+    cuda_d.output = $$CUDA_OBJECTS_DIR/${QMAKE_FILE_BASE}_cuda.o
+    cuda_d.commands = $$CUDA_DIR/bin/nvcc -D_DEBUG $$NVCC_OPTIONS $$CUDA_INC $$NVCC_LIBS --machine $$SYSTEM_TYPE -arch=$$CUDA_ARCH -c -o ${QMAKE_FILE_OUT} ${QMAKE_FILE_NAME}
+    cuda_d.dependency_type = TYPE_C
+    QMAKE_EXTRA_COMPILERS += cuda_d
+}
+else {
+    # Release mode
+    cuda.input = CUDA_SOURCES
+    cuda.output = $$CUDA_OBJECTS_DIR/${QMAKE_FILE_BASE}_cuda.o
+    cuda.commands = $$CUDA_DIR/bin/nvcc $$NVCC_OPTIONS $$CUDA_INC $$NVCC_LIBS --machine $$SYSTEM_TYPE -arch=$$CUDA_ARCH -c -o ${QMAKE_FILE_OUT} ${QMAKE_FILE_NAME}
+    cuda.dependency_type = TYPE_C
+    QMAKE_EXTRA_COMPILERS += cuda
+}
+
 # Tell Qt that we want add more stuff to the Makefile
 QMAKE_EXTRA_COMPILERS += cuda
