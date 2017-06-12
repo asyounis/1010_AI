@@ -14,28 +14,11 @@ public:
 
     Game(Player *p, Window *w, bool isTraining = false);
     ~Game();
-    // Game(Player *p);
 
-    static void getGridForPiece(int piece, int &width, int &height, int pGrid[5][5])
+    inline static void getGridForPiece(int piece, int &width, int &height, int pGrid[5][5])
     {
-
         // Clear the array
         memset(pGrid, 0, sizeof(pGrid[0][0]) * 5 * 5);
-
-        // Allocate memory for the moves
-        // int **pGrid = new int*[5];
-        // pGrid[0] = new int[5];
-        // pGrid[1] = new int[5];
-        // pGrid[2] = new int[5];
-        // pGrid[3] = new int[5];
-        // pGrid[4] = new int[5];
-
-        // Make sure the memory is cleared
-        // // memset(pGrid[0], 0, sizeof(int) * 5);
-        // memset(pGrid[1], 0, sizeof(int) * 5);
-        // memset(pGrid[2], 0, sizeof(int) * 5);
-        // memset(pGrid[3], 0, sizeof(int) * 5);
-        // memset(pGrid[4], 0, sizeof(int) * 5);
 
         if (piece == 0)
         {
@@ -206,7 +189,6 @@ public:
             pGrid[2][1] = 1;
             pGrid[2][2] = 1;
         }
-        // return pGrid;
     }
 
     void play();
@@ -220,8 +202,6 @@ private:
     int numberOfLinesCleared;
     bool isTraining;
     int numberOfPiecesPlayed;
-
-
 
 
     void clearGrid();

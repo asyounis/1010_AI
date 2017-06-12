@@ -21,10 +21,7 @@ AIPlayer::AIPlayer()
     }
 }
 
-AIPlayer::~AIPlayer()
-{
-
-}
+AIPlayer::~AIPlayer() {}
 
 bool AIPlayer::playRound(int grid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE],
                          int piece[NUMBER_OF_PIECES_PER_ROUND],
@@ -72,68 +69,76 @@ bool AIPlayer::playRound(int grid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE],
 
     delete [] permutations;
 
-    std::vector<Move*> *moves = new std::vector<Move*>();
+
+    int totalNumberOfMoves = 0;
+    std::vector<std::vector<Move*>*> vectOfMoves = std::vector<std::vector<Move*>*>();
 
     for (size_t i = 0; i < permutationsVector.size(); i++)
     {
-        calculateMoves(permutationsVector.at(i), grid, moves);
+        vectOfMoves.push_back(calculateMoves(permutationsVector.at(i), grid));
         delete [] permutationsVector.at(i);
+        totalNumberOfMoves += vectOfMoves.at(i)->size();
     }
 
-    if (moves->size() == 0)
+    if (totalNumberOfMoves == 0)
     {
-        delete moves;
-        // std::cout << "No Moves \n";
+        for (size_t i = 0; i < vectOfMoves.size(); i++)
+        {
+            delete vectOfMoves.at(i);
+        }
+
         return false;
     }
 
-    // std::cout << "Number of Moves: " << moves->size() << "\n";
 
     int bestMoveScore = 0;
-    int bestMoveIndex = 0;
-    for (size_t m = 0; m < moves->size(); m++)
-    {
-        evaluateMove(moves->at(m));
+    int bestMoveIndex[2];
+    bestMoveIndex[0] = 0;
+    bestMoveIndex[1] = 0;
 
-        if (moves->at(m)->moveScore > bestMoveScore)
+    for (size_t i = 0; i < vectOfMoves.size(); i++)
+    {
+        for (size_t m = 0; m < vectOfMoves.at(i)->size(); m++)
         {
-            bestMoveIndex = m;
+            evaluateMove(vectOfMoves.at(i)->at(m));
+
+            if (vectOfMoves.at(i)->at(m)->moveScore > bestMoveScore)
+            {
+                bestMoveIndex[0] = i;
+                bestMoveIndex[1] = m;
+            }
         }
     }
 
     for (int i = 0; i < NUMBER_OF_PIECES_PER_ROUND; i++)
     {
-        piece[i] = moves->at(bestMoveIndex)->piece[i];
-        x[i] = moves->at(bestMoveIndex)->x[i];
-        y[i] = moves->at(bestMoveIndex)->y[i];
+        piece[i] = vectOfMoves.at(bestMoveIndex[0])->at(bestMoveIndex[1])->piece[i];
+        x[i] = vectOfMoves.at(bestMoveIndex[0])->at(bestMoveIndex[1])->x[i];
+        y[i] = vectOfMoves.at(bestMoveIndex[0])->at(bestMoveIndex[1])->y[i];
     }
 
 
-
-
-    for (size_t m = 0; m < moves->size(); m++)
+    for (size_t i = 0; i < vectOfMoves.size(); i++)
     {
-        // for (int i = 0; i < GAME_BOARD_GRID_SIZE; i++)
-        // {
-            // delete [] moves->at(m)->grid[i];
-        // }
-        // delete [] moves->at(m)->grid;
-        delete moves->at(m);
+        for (size_t m = 0; m < vectOfMoves.at(i)->size(); m++)
+        {
+            delete vectOfMoves.at(i)->at(m);
+        }
+
+        delete vectOfMoves.at(i);
     }
 
-    delete moves;
     return true;
 }
 
-int AIPlayer::processGrid(int grid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE])
+int AIPlayer::processGrid(int grid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE], int x, int y, int pWidth, int pHeight)
 {
-
     int linesCleared = 0;
 
     bool rowsToClear[GAME_BOARD_GRID_SIZE];
     bool columnsToClear[GAME_BOARD_GRID_SIZE];
 
-    for (int i = 0; i < GAME_BOARD_GRID_SIZE; i++)
+    for (int i = y; i < y + pHeight; i++)
     {
         bool didFindHole = false;
 
@@ -149,7 +154,7 @@ int AIPlayer::processGrid(int grid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE])
         rowsToClear[i] = !didFindHole;
     }
 
-    for (int i = 0; i < GAME_BOARD_GRID_SIZE; i++)
+    for (int i = x; i < x + pWidth; i++)
     {
         bool didFindHole = false;
 
@@ -165,7 +170,7 @@ int AIPlayer::processGrid(int grid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE])
         columnsToClear[i] = !didFindHole;
     }
 
-    for (int i = 0; i < GAME_BOARD_GRID_SIZE; i++)
+    for (int i = y; i < y + pHeight; i++)
     {
         if (!rowsToClear[i])
         {
@@ -180,7 +185,7 @@ int AIPlayer::processGrid(int grid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE])
         }
     }
 
-    for (int i = 0; i < GAME_BOARD_GRID_SIZE; i++)
+    for (int i = x; i < x + pWidth; i++)
     {
         if (!columnsToClear[i])
         {
@@ -197,7 +202,7 @@ int AIPlayer::processGrid(int grid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE])
     return linesCleared;
 }
 
-void AIPlayer::calculateMoves(int pieces[NUMBER_OF_PIECES_PER_ROUND], int origGrid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE],  std::vector<Move*> *moves)
+std::vector<AIPlayer::Move*>* AIPlayer::calculateMoves(int pieces[NUMBER_OF_PIECES_PER_ROUND], int origGrid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE])//,  std::vector<Move*> **moves)
 {
 
     // Make an initial empty move
@@ -206,33 +211,21 @@ void AIPlayer::calculateMoves(int pieces[NUMBER_OF_PIECES_PER_ROUND], int origGr
     // Clear everything
     initMove->moveScore = 0;
     initMove->numberOfLinesCleared = 0;
-    // initMove->grid = new int*[GAME_BOARD_GRID_SIZE];
 
-    for (int i = 0; i < NUMBER_OF_PIECES_PER_ROUND; i++)
-    {
-        initMove->piece[i] = pieces[i];
-    }
+    // Copy the data into the init piece
+    memcpy(initMove->piece, pieces, sizeof(int) * NUMBER_OF_PIECES_PER_ROUND);
+    memcpy(initMove->grid, origGrid, sizeof(int) * GAME_BOARD_GRID_SIZE * GAME_BOARD_GRID_SIZE);
 
-    for (int j = 0; j < GAME_BOARD_GRID_SIZE; j++)
-    {
-        // Allocate memory
-        // initMove->grid[j] = new int[GAME_BOARD_GRID_SIZE];
-
-        // Copy into the new array;
-        for (int t = 0; t < GAME_BOARD_GRID_SIZE; t++)
-        {
-            initMove->grid[j][t] = origGrid[j][t];
-        }
-    }
-
-
+    // Create a vector of moves
     std::vector<Move*> *moveTmp = new std::vector<Move*>();
-    moveTmp->push_back(initMove);
 
+    // Insert the init piece
+    moveTmp->push_back(initMove);
 
     // Do all additional pieces
     for (int i = 0; i < NUMBER_OF_PIECES_PER_ROUND; i++)
     {
+        // Create a vector of new moves to use
         std::vector<Move*> *movetmpOrig = moveTmp;
         moveTmp = new std::vector<Move*>();
 
@@ -271,35 +264,23 @@ void AIPlayer::calculateMoves(int pieces[NUMBER_OF_PIECES_PER_ROUND], int origGr
                         }
                     }
 
+                    // Move on if it is not a valid move
                     if (!isValidMove)
                     {
                         continue;
                     }
 
+                    // Create a new move
                     Move  *newMove = new Move(*currentMove);
 
-                    for (int pI = 0;  pI < NUMBER_OF_PIECES_PER_ROUND; pI++)
-                    {
-                        newMove->piece[pI] = currentMove->piece[pI];
-                    }
-
+                    // Copy the data over
                     newMove->numberOfLinesCleared = currentMove->numberOfLinesCleared;
+                    memcpy(newMove->piece, currentMove->piece, sizeof(int) * NUMBER_OF_PIECES_PER_ROUND);
+                    memcpy(newMove->grid, currentMove->grid, sizeof(int) * GAME_BOARD_GRID_SIZE * GAME_BOARD_GRID_SIZE);
+
+                    // Set the piece position for this piece
                     newMove->x[i] = piecePlacementX;
                     newMove->y[i] = piecePlacementY;
-
-                    // newMove->grid = new int*[GAME_BOARD_GRID_SIZE];
-
-                    for (int j = 0; j < GAME_BOARD_GRID_SIZE; j++)
-                    {
-                        // Allocate memory
-                        // newMove->grid[j] = new int[GAME_BOARD_GRID_SIZE];
-
-                        // Copy into the new array;
-                        for (int t = 0; t < GAME_BOARD_GRID_SIZE; t++)
-                        {
-                            newMove->grid[j][t] = currentMove->grid[j][t];
-                        }
-                    }
 
                     // Place the piece since valid
                     for (int pX = 0; pX < pWidth; pX++)
@@ -310,17 +291,14 @@ void AIPlayer::calculateMoves(int pieces[NUMBER_OF_PIECES_PER_ROUND], int origGr
                         }
                     }
 
-                    newMove->numberOfLinesCleared += processGrid(newMove->grid);
+                    // Get the number of cleared lines and process the grid
+                    newMove->numberOfLinesCleared += processGrid(newMove->grid, piecePlacementX , piecePlacementY, pWidth, pHeight);
 
+                    // Add the piece into the move temp for the next round
                     moveTmp->push_back(newMove);
                 }
             }
 
-            // for (int g = 0; g < GAME_BOARD_GRID_SIZE; g++)
-            // {
-                // delete [] currentMove->grid[g];
-            // }
-            // delete [] currentMove->grid;
             delete movetmpOrig->at(m);
         }
 
@@ -328,18 +306,14 @@ void AIPlayer::calculateMoves(int pieces[NUMBER_OF_PIECES_PER_ROUND], int origGr
     }
 
 
-    moves->insert(moves->end(), moveTmp->begin(), moveTmp->end());
+    // moves->insert(moves->end(), moveTmp->begin(), moveTmp->end());
 
-    // for (size_t m = 0; m < moveTmp->size(); m++)
-    // {
-        // moves->push_back(moveTmp->at(m));
-    // }
+    // *moves = moveTmp;
+    return moveTmp;
 
-    
-    moveTmp->clear();
-    delete moveTmp;
+    // moveTmp->clear();
+    // delete moveTmp;
 }
-
 
 void AIPlayer::evaluateMove(Move *m)
 {
@@ -438,31 +412,32 @@ void AIPlayer::evaluateMove(Move *m)
     {
         for (int y = 0; y < GAME_BOARD_GRID_SIZE; y++)
         {
-            bool isLockedCell = true;
             if (((x - 1) >= 0) && (m->grid[y][x - 1] == 0))
             {
-                isLockedCell = false;
+                // Do nothing
             }
             else if (((y - 1) >= 0) && (m->grid[y - 1][x] == 0))
             {
-                isLockedCell = false;
+                // Do nothing
             }
             else if (((y + 1) < GAME_BOARD_GRID_SIZE) && (m->grid[y + 1][x] == 0))
             {
-                isLockedCell = false;
+                // Do nothing
             }
             else if (((x + 1) < GAME_BOARD_GRID_SIZE) && (m->grid[y][x + 1] == 0))
             {
-                isLockedCell = false;
+                // Do nothing
             }
-
-            if (isLockedCell)
+            else
             {
+                // Non of the tests passed so its a hall
                 numberOfHoles++;
             }
+
         }
     }
 
+    // Get the largest rectangle
     largestRectangleArea = maxRectangle(m->grid);
 
     m->moveScore =  (heuristicCoeff[0] * (float)m->numberOfLinesCleared);
@@ -536,7 +511,6 @@ int** AIPlayer::calculateOrderPermutations(int *p, int count)
 
     return ret;
 }
-
 
 
 // Finds the maximum area under the histogram represented

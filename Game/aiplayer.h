@@ -31,8 +31,8 @@ private:
     int calculateNumberOfOrderPermutations(int c);
     int** calculateOrderPermutations(int *p, int count);
 
-    void calculateMoves(int pieces[NUMBER_OF_PIECES_PER_ROUND], int grid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE], std::vector<Move*> *moves);
-    int processGrid(int grid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE]);
+    std::vector<AIPlayer::Move*>* calculateMoves(int pieces[NUMBER_OF_PIECES_PER_ROUND], int grid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE]);
+    int processGrid(int grid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE], int x, int y, int pWidth, int pHeight);
     void evaluateMove(Move *m);
 
 

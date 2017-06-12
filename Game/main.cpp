@@ -11,29 +11,23 @@
 #include <cstdio>
 #include <iomanip>
 #include <mutex>
-#include <sstream>      // std::stringstream
+#include <sstream>
 #include <ctime>
 #include <chrono>
 
-Game *game;
 
-#define POPULATION_SIZE (10000)
+#define POPULATION_SIZE (1000)
 #define RUNS_PER_PARAM_VECT (100)
-#define SUBSET_OF_POPULATION_TO_SELECT (1000)
-#define NUMBER_OF_NEW_OFFSPRING (3000)
+#define SUBSET_OF_POPULATION_TO_SELECT (100)
+#define NUMBER_OF_NEW_OFFSPRING (300)
 #define NUMBER_OF_TUNING_RUNS (200)
-
-#define NUMBER_OF_THREADS (8)
-
-
+#define NUMBER_OF_THREADS (7)
 #define SAVE_FILE ("/Users/Ali/Desktop/1010_AI/Game/pop.txt")
-
 
 
 
 float population[POPULATION_SIZE][NUMBER_OF_HEURISTICS];
 int scores[POPULATION_SIZE];
-
 
 int populationIndex = 0;
 std::mutex populationIndexMutex;
@@ -67,7 +61,6 @@ void gamePlay() {
         }
     }
 }
-
 
 void gamePlay2(Game *game) {
     game->play();
@@ -207,7 +200,7 @@ void createNewPopulation()
             mag += (newVect[j][i] * newVect[j][i]);
         }
 
-        if ((rand() % 100) < 20)
+        if ((rand() % 100) < 10)
         {
             std::cout << "Mutating \n";
 
@@ -215,7 +208,7 @@ void createNewPopulation()
             float amount = rand() % 200000000;
             amount -= 100000000.0;
             amount /= 100000000.0;
-            amount *= 0.02;
+            amount *= 0.2;
             // amount *= 0.002;
 
             mag -= (newVect[j][component] * newVect[j][component]);
@@ -278,28 +271,11 @@ void printBestParamVector()
 
 int main(int argc, char *argv[])
 {
-
-    // for (int i = 0; i < POPULATION_SIZE; i++)
-    // {
-    //     scores[i] = i;
-    // }
-
-    // sort_indexes(scores);
-    // for (auto i : sort_indexes(scores)) {
-    //     std::cout << i << "   " << scores[i] << "\n";
-    // }
-
-
-
-
-    // return 0;
-
-
     QApplication a(argc, argv);
     Window window;
     window.show();
 
-    // float population[POPULATION_SIZE][NUMBER_OF_HEURISTICS];
+
 
     if (!loadPopulationToFile())
     {
@@ -403,15 +379,6 @@ int main(int argc, char *argv[])
                   << " ms\n";
     }
 
-
-
-// AIPlayer player =  AIPlayer();
-// Game *game = new Game(&player, NULL);
-// game = new Game(&player, &window);
-
-// std::thread t1(gamePlay, game);
-
-
     std::cout << "Tuning Done" << "\n" ;
     std::cout << "--------------------" << "\n" ;
     printBestParamVector();
@@ -422,26 +389,24 @@ int main(int argc, char *argv[])
 
 
 
-// int main(int argc, char *argv[])
-// {
+int main2(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    Window window;
+    window.show();
 
-//     QApplication a(argc, argv);
-//     Window window;
-//     window.show();
+    float heuristicCoeff[NUMBER_OF_HEURISTICS];
+    heuristicCoeff[0] = 0.87644898891449;
+    heuristicCoeff[1] =  0.473638504743576;
+    heuristicCoeff[2] = -0.0289361644536257;
+    heuristicCoeff[3] =  -0.0366345383226871;
+    heuristicCoeff[4] =  -0.0729684233665466;
 
+    AIPlayer player =  AIPlayer(heuristicCoeff);
+    Game *game = new Game(&player, NULL);
+    game = new Game(&player, &window);
 
-//     float heuristicCoeff[NUMBER_OF_HEURISTICS];
-//     heuristicCoeff[0] = 0.87644898891449;
-//     heuristicCoeff[1] =  0.473638504743576;
-//     heuristicCoeff[2] = -0.0289361644536257;
-//     heuristicCoeff[3] =  -0.0366345383226871;
-//     heuristicCoeff[4] =  -0.0729684233665466;
+    std::thread t1(gamePlay2, game);
 
-//     AIPlayer player =  AIPlayer(heuristicCoeff);
-//     Game *game = new Game(&player, NULL);
-//     game = new Game(&player, &window);
-
-//     std::thread t1(gamePlay2, game);
-
-//     return a.exec();
-// }
+    return a.exec();
+}

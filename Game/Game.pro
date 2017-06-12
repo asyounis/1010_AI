@@ -70,7 +70,7 @@ CUDA_LIBS = -lcudart
 
 SYSTEM_TYPE = 64
 # GPU architecture
-CUDA_ARCH = sm_22
+CUDA_ARCH = sm_21
 
 NVCC_OPTIONS = --use_fast_math
 
