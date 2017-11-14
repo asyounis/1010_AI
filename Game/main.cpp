@@ -17,11 +17,11 @@
 
 
 #define POPULATION_SIZE (1000)
-#define RUNS_PER_PARAM_VECT (100)
+#define RUNS_PER_PARAM_VECT (12)
 #define SUBSET_OF_POPULATION_TO_SELECT (100)
 #define NUMBER_OF_NEW_OFFSPRING (300)
 #define NUMBER_OF_TUNING_RUNS (200)
-#define NUMBER_OF_THREADS (7)
+#define NUMBER_OF_THREADS (8)
 #define SAVE_FILE ("/Users/Ali/Desktop/1010_AI/Game/pop.txt")
 
 
@@ -32,39 +32,6 @@ int scores[POPULATION_SIZE];
 int populationIndex = 0;
 std::mutex populationIndexMutex;
 
-void gamePlay() {
-
-    while (true) {
-        populationIndexMutex.lock();
-        int i = populationIndex;
-        populationIndex++;
-        populationIndexMutex.unlock();
-
-        if (i >= POPULATION_SIZE)
-        {
-            break;
-        }
-
-        if ((i % (POPULATION_SIZE / 100)) == 0)
-        {
-            std::cout << "i: " << i << "/" << POPULATION_SIZE << "\n";
-        }
-
-        scores[i] = 0;
-        for (int j = 0; j < RUNS_PER_PARAM_VECT; j++)
-        {
-            AIPlayer *player = new AIPlayer(population[i]);
-            Game *game = new Game(player, NULL, true);
-            game->play();
-            scores[i] += game->getNumberOfLinesCleared();
-            delete game;
-        }
-    }
-}
-
-void gamePlay2(Game *game) {
-    game->play();
-}
 
 
 std::vector<int> sort_indexes(int scores[POPULATION_SIZE]) {
@@ -78,7 +45,6 @@ std::vector<int> sort_indexes(int scores[POPULATION_SIZE]) {
 
     return idx;
 }
-
 
 void savePopulationToFile()
 {
@@ -139,7 +105,6 @@ bool loadPopulationToFile()
     return true;
 }
 
-
 void createNewPopulation()
 {
     float newVect[NUMBER_OF_NEW_OFFSPRING][NUMBER_OF_HEURISTICS];
@@ -156,18 +121,7 @@ void createNewPopulation()
         int fittest1 = 0;
         int fittest2 = 0;
 
-        std::set<int>::iterator it;
-        for (it = popSubSet.begin(); it != popSubSet.end(); ++it)
-        {
-            int paramVectIndex = *it;
-            if (scores[paramVectIndex] > scores[fittest1])
-            {
-                fittest1 = paramVectIndex;
-            }
-        }
 
-
-        // popSubSet.erase(popSubSet.find(fittest1));
 
 
 
@@ -193,16 +147,35 @@ void createNewPopulation()
 
 
 
+        float scoreMag = (float)scores[fittest1] * (float)scores[fittest1];
+        scoreMag += (float)scores[fittest2] * (float)scores[fittest2];
+        scoreMag = sqrt(scoreMag);
+
+
+        float ratio1 = 0;
+        float ratio2 = 0;
+
+        if (scoreMag == 0)
+        {
+            ratio1 = 1;
+            ratio2 = 1;
+        }
+        else
+        {
+            ratio1 = (float)scores[fittest1] / scoreMag;
+            ratio2 = (float)scores[fittest2] / scoreMag;
+        }
+
         float mag = 0;
         for (int i = 0; i < NUMBER_OF_HEURISTICS; i++)
         {
-            newVect[j][i] = (population[fittest1][i] * (float)scores[fittest1]) + (population[fittest2][i] * (float)scores[fittest2]);
+            newVect[j][i] = (population[fittest1][i] * ratio1) + (population[fittest2][i] * ratio2);
             mag += (newVect[j][i] * newVect[j][i]);
         }
 
-        if ((rand() % 100) < 10)
+        if ((rand() % 100) < 50)
         {
-            std::cout << "Mutating \n";
+            // std::cout << "Mutating \n";
 
             int component = rand() % NUMBER_OF_HEURISTICS;
             float amount = rand() % 200000000;
@@ -244,7 +217,7 @@ void createNewPopulation()
 
         for (int i = 0; i < NUMBER_OF_HEURISTICS; i++)
         {
-            population[index][i] =   newVect[j][i];
+            population[index][i] =  newVect[j][i];
         }
     }
 
@@ -269,7 +242,50 @@ void printBestParamVector()
     }
 }
 
-int main(int argc, char *argv[])
+
+
+void gamePlay() {
+
+    while (true) {
+        populationIndexMutex.lock();
+        int i = populationIndex;
+        populationIndex++;
+        populationIndexMutex.unlock();
+
+        if (i >= POPULATION_SIZE)
+        {
+            break;
+        }
+
+        if ((i % (POPULATION_SIZE / 100)) == 0)
+        {
+            std::cout << "i: " << i << "/" << POPULATION_SIZE << "\n";
+        }
+
+        scores[i] = 0;
+        for (int j = 0; j < RUNS_PER_PARAM_VECT; j++)
+        {
+            AIPlayer *player = new AIPlayer(population[i]);
+            Game *game = new Game(player, NULL, true);
+            game->play();
+            scores[i] += game->getNumberOfLinesCleared();
+            delete game;
+        }
+    }
+}
+
+void gamePlay2(Game *game) {
+    game->play();
+
+    std::cout << game->getNumberOfLinesCleared() << "\n";
+}
+
+
+
+
+
+
+int main1(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     Window window;
@@ -389,24 +405,28 @@ int main(int argc, char *argv[])
 
 
 
-int main2(int argc, char *argv[])
+// Main Game Play
+int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     Window window;
-    window.show();
-
+    window.show();  
+  
+  
     float heuristicCoeff[NUMBER_OF_HEURISTICS];
-    heuristicCoeff[0] = 0.87644898891449;
-    heuristicCoeff[1] =  0.473638504743576;
-    heuristicCoeff[2] = -0.0289361644536257;
-    heuristicCoeff[3] =  -0.0366345383226871;
-    heuristicCoeff[4] =  -0.0729684233665466;
+    heuristicCoeff[0] = 0.905054807662964;
+    heuristicCoeff[1] = 0.296139121055603;
+    heuristicCoeff[2] = -0.168864816427231;
+    heuristicCoeff[3] = -0.254287302494049;
 
     AIPlayer player =  AIPlayer(heuristicCoeff);
-    Game *game = new Game(&player, NULL);
-    game = new Game(&player, &window);
+    // Game *game = new Game(&player, NULL);
+     Game *game = new Game(&player, &window);
 
     std::thread t1(gamePlay2, game);
 
     return a.exec();
 }
+
+
+      

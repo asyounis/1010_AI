@@ -7,6 +7,12 @@
 
 
 
+extern "C"
+int launchCuda(int grid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE],
+               int piece[NUMBER_OF_PIECES_PER_ROUND],
+               float heuristicCoeff[NUMBER_OF_HEURISTICS],
+               int moveX[NUMBER_OF_PIECES_PER_ROUND],
+               int moveY[NUMBER_OF_PIECES_PER_ROUND]);
 
 AIPlayer::AIPlayer(float heuristicCoeff[NUMBER_OF_HEURISTICS])
 {
@@ -73,12 +79,48 @@ bool AIPlayer::playRound(int grid[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE],
     int totalNumberOfMoves = 0;
     std::vector<std::vector<Move*>*> vectOfMoves = std::vector<std::vector<Move*>*>();
 
+
+
+    // auto t_start = std::chrono::high_resolution_clock::now();
+
+    // int moveX[NUMBER_OF_PIECES_PER_ROUND];
+    // int moveY[NUMBER_OF_PIECES_PER_ROUND];
+
+    // for (size_t i = 0; i < permutationsVector.size(); i++)
+    // {
+
+    //     // std::cout << "here1" << "\n";
+    // launchCuda(grid, permutationsVector.at(i), heuristicCoeff, moveX, moveY);
+    // std::cout << "here2" << "\n";
+    // }
+
+    // auto t_start1 = std::chrono::high_resolution_clock::now();
+
     for (size_t i = 0; i < permutationsVector.size(); i++)
     {
         vectOfMoves.push_back(calculateMoves(permutationsVector.at(i), grid));
         delete [] permutationsVector.at(i);
         totalNumberOfMoves += vectOfMoves.at(i)->size();
     }
+
+    // auto t_end = std::chrono::high_resolution_clock::now();
+
+
+    // std::cout << std::chrono::duration<double, std::milli>(t_start1 - t_start).count() << "    "
+    // << std::chrono::duration<double, std::milli>(t_end - t_start1).count() << "    "
+    // << " ms\n";
+
+
+
+
+
+
+    // for (size_t i = 0; i < permutationsVector.size(); i++)
+    // {
+    //         vectOfMoves.push_back(calculateMoves(permutationsVector.at(i), grid));
+    //     delete [] permutationsVector.at(i);
+    //     totalNumberOfMoves += vectOfMoves.at(i)->size();
+    // }
 
     if (totalNumberOfMoves == 0)
     {
@@ -319,7 +361,6 @@ void AIPlayer::evaluateMove(Move *m)
 {
     int numberOfHoles = 0;
     int numberOfFreeLines = 0;
-    int largestRectangleArea = 0;
     int totalNumberOfLineClusters = 0;
 
     bool freeRows[GAME_BOARD_GRID_SIZE];
@@ -412,6 +453,12 @@ void AIPlayer::evaluateMove(Move *m)
     {
         for (int y = 0; y < GAME_BOARD_GRID_SIZE; y++)
         {
+            if (m->grid[y][x] != 0)
+            {
+                continue;
+            }
+
+
             if (((x - 1) >= 0) && (m->grid[y][x - 1] == 0))
             {
                 // Do nothing
@@ -437,14 +484,11 @@ void AIPlayer::evaluateMove(Move *m)
         }
     }
 
-    // Get the largest rectangle
-    largestRectangleArea = maxRectangle(m->grid);
 
     m->moveScore =  (heuristicCoeff[0] * (float)m->numberOfLinesCleared);
     m->moveScore += (heuristicCoeff[1] * (float)numberOfFreeLines);
     m->moveScore += (heuristicCoeff[2] * (float)numberOfHoles);
-    m->moveScore += (heuristicCoeff[3] * (float)largestRectangleArea);
-    m->moveScore += (heuristicCoeff[4] * (float)totalNumberOfLineClusters);
+    m->moveScore += (heuristicCoeff[3] * (float)totalNumberOfLineClusters);
 }
 
 int AIPlayer::calculateNumberOfOrderPermutations(int c)
@@ -513,86 +557,3 @@ int** AIPlayer::calculateOrderPermutations(int *p, int count)
 }
 
 
-// Finds the maximum area under the histogram represented
-// by histogram.  See below article for details.
-// http://www.geeksforgeeks.org/largest-rectangle-under-histogram/
-int AIPlayer::maxHist(int row[GAME_BOARD_GRID_SIZE])
-{
-    // Create an empty stack. The stack holds indexes of
-    // hist[] array/ The bars stored in stack are always
-    // in increasing order of their heights.
-    std::stack<int> result;
-
-    int top_val;     // Top of stack
-
-    int max_area = 0; // Initialize max area in current
-    // row (or histogram)
-
-    int area = 0;    // Initialize area with current top
-
-    // Run through all bars of given histogram (or row)
-    int i = 0;
-    while (i < GAME_BOARD_GRID_SIZE)
-    {
-        // If this bar is higher than the bar on top stack,
-        // push it to stack
-        if (result.empty() || row[result.top()] <= row[i])
-            result.push(i++);
-
-        else
-        {
-            // If this bar is lower than top of stack, then
-            // calculate area of rectangle with stack top as
-            // the smallest (or minimum height) bar. 'i' is
-            // 'right index' for the top and element before
-            // top in stack is 'left index'
-            top_val = row[result.top()];
-            result.pop();
-            area = top_val * i;
-
-            if (!result.empty())
-                area = top_val * (i - result.top() - 1 );
-            max_area = std::max(area, max_area);
-        }
-    }
-
-    // Now pop the remaining bars from stack and calculate area
-    // with every popped bar as the smallest bar
-    while (!result.empty())
-    {
-        top_val = row[result.top()];
-        result.pop();
-        area = top_val * i;
-        if (!result.empty())
-            area = top_val * (i - result.top() - 1 );
-
-        max_area = std::max(area, max_area);
-    }
-    return max_area;
-}
-
-// Returns area of the largest rectangle with all 1s in A[][]
-int AIPlayer::maxRectangle(int A[GAME_BOARD_GRID_SIZE][GAME_BOARD_GRID_SIZE])
-{
-    // Calculate area for first row and initialize it as
-    // result
-    int result = maxHist(A[0]);
-
-    // iterate over row to find maximum rectangular area
-    // considering each row as histogram
-    for (int i = 1; i < GAME_BOARD_GRID_SIZE; i++)
-    {
-
-        for (int j = 0; j < GAME_BOARD_GRID_SIZE; j++)
-
-            // if A[i][j] is 1 then add A[i -1][j]
-            if (A[i][j]) A[i][j] += A[i - 1][j];
-
-
-        // Update result if area with current row (as last row)
-        // of rectangle) is more
-        result = std::max(result, maxHist(A[i]));
-    }
-
-    return result;
-}
